@@ -1,13 +1,12 @@
 (function() {
 
-    // used to prevent browser caching of .js file with main application logic --check
+    // used to prevent browser caching of .js file with main application logic 
     var randomNumber = Math.floor( Math.random() * 999999 );
-alert("Path : " );
+
     // URL builder helper
     function appURL(relativePath) {
       var basePath = 'http://github.com/savithasr/onext/raw/master';
-      alert("Path : " + basePath + relativePath);
-      return basePath + relativePath;
+         return basePath + relativePath;
     }
     
     function loadScripts(scripts) {
