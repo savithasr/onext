@@ -812,7 +812,7 @@ OnDemandLib.prototype.saveProdDetail = function ()
 	var indication = "Allergy";
 	alert("prodname:"+prodName);
 	var fields = {
-            ProductId: " ='" + prodName + "' ",
+            Name: " ='" + prodName + "' ",
             IndexedPick0: " ='" + indication + "' "
         };
 	
