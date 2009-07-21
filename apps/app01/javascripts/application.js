@@ -130,7 +130,7 @@ var augmentCallDetailsEntry = function() {
 	row += "<td>Indication: <select><option></option><option>Allergy</option><option>Asthma</option></td>";
 	row += "<td>Issues: <select><option></option><option>Side effects</option><option>Efficacy</option></td>";
 	row += "<td><input type='button' name='delete' value='delete' onclick='jQuery(this).parent().parent().remove()'></input></td>";
-	row += "<td><input type='button' name='save' value='save' onclick='saveProdDetail();'></input></td>";
+	row += "<td><input type='button' name='save' value='save' onclick='jQuery(this).saveProdDetail();'></input></td>";
 	row += "</tr>";
 
 	var html = "<div>";
