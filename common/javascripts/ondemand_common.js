@@ -860,9 +860,11 @@ OnDemandLib.prototype.saveProdDetail = function ()
 			dataType: 'xml',
 			data: soapRequest,
 			beforeSend: function(xhr) {
+				alert("Before Web Service Call");
 				xhr.setRequestHeader('SOAPAction', '"' + soapAction + '"');
 			},            
 			success: function(xmlData, textStatus) {
+				alert("After Web Service Call");
 			}
 		});	
 }
