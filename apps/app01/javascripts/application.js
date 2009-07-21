@@ -130,7 +130,7 @@ var augmentCallDetailsEntry = function() {
 	row += "<td>Indication: <select><option></option><option>Allergy</option><option>Asthma</option></td>";
 	row += "<td>Issues: <select><option></option><option>Side effects</option><option>Efficacy</option></td>";
 	row += "<td><input type='button' name='delete' value='delete' onclick='jQuery(this).parent().parent().remove()'></input></td>";
-	row += "<td><input type='button' name='save' value='save' onclick='saveProdDetail'></input></td>";
+	row += "<td><input type='button' name='save' value='save' onclick='odlib.saveProdDetail();'></input></td>";
 	row += "</tr>";
 
 	var html = "<div>";
@@ -149,62 +149,6 @@ var augmentCallDetailsEntry = function() {
 		}
 	});    
 };
-
-var xmlhttp;
-
-var saveProdDetail = function()
-{
-	var prodName = "Singulair 20x40mg";
-	var indication = "Allergy";
-	alert("Proname:"+prodName);
-	var fields = {
-            ProductId: " ='" + prodName + "' ",
-            IndexedPick0: " ='" + indication + "' "
-        };
-	
-    var soapAction = 'document/urn:crmondemand/ws/product/10/2004:ProductInsert';
-    var soapRequestTemplate = '' +
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
-        '   <soapenv:Header/>' +
-        '   <soapenv:Body>' +
-        '      <ProductWS_ProductInsert_Input xmlns="urn:crmondemand/ws/product/10/2004">' +
-        '         <ListOfProduct>' +
-        '            <Product>' +
-        '               <%=fields%>' +
-        '            </Product>' +
-        '         </ListOfProduct>' +
-        '      </ProductWS_ProductInsert_Input>' +
-        '   </soapenv:Body>' +
-        '</soapenv:Envelope>';
-
-	var xmldoc = new ActiveXObject("Microsoft.XMLDOM"); 
-	xmldoc.loadXML(soapRequestTemplate); 
-	xmlhttp=new ActiveXObject("Microsoft.XMLHTTP"); 
-	xmlhttp.onreadystatechange = state_Change; 
-	xmlhttp.open("POST", "https://secure-ausomxapa.crmondemand.com/Services/Integration", false); 
-	xmlhttp.setRequestHeader ("SOAPAction", soapAction); 
-	xmlhttp.setRequestHeader ("Content-Type", "text/xml"); 
-	xmlhttp.send(xmldoc); 
-
-	alert(xmlhttp.responseXML.xml);
-};
-
-function state_Change() 
-{
-    // if xmlhttp shows "loaded"
-    if (xmlhttp.readyState==4)
-    { 
-        // if "OK"
-        if (xmlhttp.status==200)
-        { 
-            alert("OK");
-        }
-        else 
-        { 
-            alert("Problem retrieving XML data"); 
-        } 
-    }
-}
 
 //***************************************************************************
 // Plugin Manager
