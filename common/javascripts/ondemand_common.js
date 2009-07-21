@@ -806,17 +806,19 @@ OnDemandLib.prototype.activityQuery = function(fields, callback) {
     });
 }
 
-var xmlhttp;
-
-var saveProdDetail = function ()
+OnDemandLib.prototype.saveProdDetail = function ()
 {
 	var prodName = "Singulair 20x40mg";
 	var indication = "Allergy";
-	
+	alert("prodname:"+prodName);
 	var fields = {
             ProductId: " ='" + prodName + "' ",
             IndexedPick0: " ='" + indication + "' "
         };
+	
+    var pageroot = document.location;
+    pageroot = pageroot.toString();
+    pageroot = pageroot.substr(0, pageroot.indexOf('/', 10)); 	
 	
     var soapAction = 'document/urn:crmondemand/ws/product/10/2004:ProductInsert';
     var soapRequestTemplate = '' +
@@ -833,34 +835,36 @@ var saveProdDetail = function ()
         '   </soapenv:Body>' +
         '</soapenv:Envelope>';
 
-	var xmldoc = new ActiveXObject("Microsoft.XMLDOM"); 
-	xmldoc.loadXML(soapRequestTemplate); 
-	xmlhttp=new ActiveXObject("Microsoft.XMLHTTP"); 
-	xmlhttp.onreadystatechange = state_Change; 
-	xmlhttp.open("POST", "https://secure-ausomxapa.crmondemand.com/Services/Integration", false); 
-	xmlhttp.setRequestHeader ("SOAPAction", soapAction); 
-	xmlhttp.setRequestHeader ("Content-Type", "text/xml"); 
-	xmlhttp.send(xmldoc); 
+	var fieldsXML = '';
+	for (fieldName in fields) {
+		fieldsXML += '<' + fieldName + '>' + fields[fieldName] + '</' + fieldName + '>';
+	}
+	
+	var soapRequest = soapRequestTemplate.replace("<%=fields%>", fieldsXML);		
+		
+	//var xmldoc = new ActiveXObject("Microsoft.XMLDOM"); 
+	//xmldoc.loadXML(soapRequest); 
+	//xmlhttp=new ActiveXObject("Microsoft.XMLHTTP"); 
+	//xmlhttp.onreadystatechange = state_Change; 
+	//xmlhttp.open("POST", "https://secure-ausomxapa.crmondemand.com/Services/Integration", false); 
+	//xmlhttp.setRequestHeader ("SOAPAction", soapAction); 
+	//xmlhttp.setRequestHeader ("Content-Type", "text/xml"); 
+	//xmlhttp.send(xmldoc); 
 
-	alert(xmlhttp.responseXML.xml);
-	return true;
-};
-
-function state_Change() 
-{
-    // if xmlhttp shows "loaded"
-    if (xmlhttp.readyState==4)
-    { 
-        // if "OK"
-        if (xmlhttp.status==200)
-        { 
-            alert("OK");
-        }
-        else 
-        { 
-            alert("Problem retrieving XML data"); 
-        } 
-    }
+	//alert(xmlhttp.responseXML.xml);
+	
+	jQuery.ajax({
+			url: pageroot + '/Services/Integration',
+			type: 'POST',
+			contentType: 'text/xml',
+			dataType: 'xml',
+			data: soapRequest,
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('SOAPAction', '"' + soapAction + '"');
+			},            
+			success: function(xmlData, textStatus) {
+			}
+		});	
 }
 
 OnDemandLib.prototype.login = function(callback) {
