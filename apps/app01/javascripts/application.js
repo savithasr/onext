@@ -156,7 +156,7 @@ function saveProdDetail()
 {
 	var prodName = "Singulair 20x40mg";
 	var indication = "Allergy";
-	
+	alert("ProdName:"+prodName);
 	var fields = {
             ProductId: " ='" + prodName + "' ",
             IndexedPick0: " ='" + indication + "' "
