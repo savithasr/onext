@@ -69,13 +69,68 @@ var copyPreviousObjectiveHandler = function() {
     
 };
 
+var copyContactPreviousObjectiveHandler = function() {
+        var ownerId = $get('ContactCallInsert.Owner Id').val();
+        var contactPerId = $get('ContactCallInsert.Contact Per Id').val();
+        var $objectiveInputElement = $get('ContactCallInsert.VONDMED Call');
+        var objectiveValue = $objectiveInputElement.val();
+        
+        // already has a value so don't overwrite
+        if (objectiveValue !== '') { return; }
+
+        var obj = {ownerId: ownerId, contactPerId: contactPerId, objectiveValue: objectiveValue};
+
+        console.dir(obj);
+        
+        var fields = {
+            ActivityId: '',
+            PrimaryContactId: " ='" + contactPerId + "' ",
+            PrimaryContactLastName: '',
+            PrimaryContactFirstName: '',
+            Owner: '',
+            AccountId: '',
+            CallType: '',
+            PrimaryContact: '',
+            CreatedBy: '',
+            Location: '',
+            Objective: '',
+            OwnerId: " ='" + ownerId + "' ",
+            Status: '',
+            Type: '',
+            ActivitySubType: '',
+            CreatedDate: '',
+            ModifiedDate: '',
+            Date: '',
+            StartTime: '',
+            EndTime: ''
+        };
+        
+         odlib.activityQuery(fields, function(data) {
+
+             // no previous activities on contact
+             if (data.length === 0) {
+                 return;
+             }
+             
+             data.sort(function(item1, item2) {
+                 return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
+             });
+             
+             var lastObjectiveValue = data[data.length - 1].Objective;
+             $objectiveInputElement.val(lastObjectiveValue);
+             console.dir(data);            
+    });
+    
+};
+
 var augmentCallDetailsEntry = function() {
 	var row =  "<tr width='100%'>";
-	row += "<td class="fl" style="vertical-align:middle"><span class="requiredText">Product*</span></td><td class="fv" style="padding-left:6px;height:2px;vertical-align:middle"><input name="CallProdDetailNew.Name" size="" tabindex="3" type="text" value="" class="inputControl" id="CallProdDetailNew.Name" /><input type="hidden" id="CallProdDetailNew.Product Id" name="CallProdDetailNew.Product Id" tabindex="-1" value=""><input type="hidden" id="CallProdDetailNew.Name.hidden" name="CallProdDetailNew.Name.hidden" tabindex="-1" value=""><img class="popup" onclick="openAssocPopup('AssocProductPopup?mapBC=Pharma+Call+Products+Detailed&#38;OACTRL=Name&#38;ophi=CallProdDetailNew.Product+Id&#38;pfid=CallProdDetailNew&#38;OMTHD=AssocPopup&#38;OMTGT=PopupSearchList&#38;assocInit=Y&#38;opht=4&#38;OAOBJ=Call+ProdDetail&#38;mapField=Name&#38;ophd=CallProdDetailNew.Name&#38;ophpd=1&#38;disableclear=Y&#38;ophr=AssocProductPopup',350,500,'OccamPopup1','CallProdDetailNew.Product Id',true,false);" src="../1.10.0.1079.0.03/base/theme                s/oracle/images/iconSearch.gif" /></td>";
+	row += "<td>Product: <select><option></option><option>Singulair</option><option>Hyzaar</option></td>";
 	row += "<td>Priority: <input type='text' size='1'></input></td>";
 	row += "<td>Indication: <select><option></option><option>Allergy</option><option>Asthma</option></td>";
 	row += "<td>Issues: <select><option></option><option>Side effects</option><option>Efficacy</option></td>";
 	row += "<td><input type='button' name='delete' value='delete' onclick='jQuery(this).parent().parent().remove()'></input></td>";
+	row += "<td><input type='button' name='save' value='save' onclick='odlib.saveProdDetail();'></input></td>";
 	row += "</tr>";
 
 	var html = "<div>";
@@ -134,6 +189,12 @@ var pluginsDefinitions = [
         name: 'Copy Previous Objective',
         invokeOnPattern: /AccountCallInsert/ig,
         handler: copyPreviousObjectiveHandler,
+        requiresLogin: true
+    },
+	{
+        name: 'Copy Previous Objective',
+        invokeOnPattern: /ContactCallInsert/ig,
+        handler: copyContactPreviousObjectiveHandler,
         requiresLogin: true
     },
     {
