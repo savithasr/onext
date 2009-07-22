@@ -124,8 +124,29 @@ var copyContactPreviousObjectiveHandler = function() {
 };
 
 var augmentCallDetailsEntry = function() {
-<tr name="" id=""><td class="fl" style="vertical-align:middle"><span class="fl">Product Category</span></td><td class="fv" style="padding-left:6px;height:2px;vertical-align:middle"><input name="CallProdDetailNew.Primary Product Line Name" id="CallProdDetailNew.Primary Product Line Name" maxlength="100" class="inputReadOnly" tabindex="-1" readonly="readonly" type="text" value="" size="20" /></td></tr>
-	   
+	var row =  "<tr width='100%'>";
+	row += "<td class="fl" style="vertical-align:middle"><span class="requiredText">Product*</span></td><td class="fv" style="padding-left:6px;height:2px;vertical-align:middle"><input name="CallProdDetailNew.Name" size="" tabindex="3" type="text" value="" class="inputControl" id="CallProdDetailNew.Name" /><input type="hidden" id="CallProdDetailNew.Product Id" name="CallProdDetailNew.Product Id" tabindex="-1" value=""><input type="hidden" id="CallProdDetailNew.Name.hidden" name="CallProdDetailNew.Name.hidden" tabindex="-1" value=""><img class="popup" onclick="openAssocPopup('AssocProductPopup?mapBC=Pharma+Call+Products+Detailed&#38;OACTRL=Name&#38;ophi=CallProdDetailNew.Product+Id&#38;pfid=CallProdDetailNew&#38;OMTHD=AssocPopup&#38;OMTGT=PopupSearchList&#38;assocInit=Y&#38;opht=4&#38;OAOBJ=Call+ProdDetail&#38;mapField=Name&#38;ophd=CallProdDetailNew.Name&#38;ophpd=1&#38;disableclear=Y&#38;ophr=AssocProductPopup',350,500,'OccamPopup1','CallProdDetailNew.Product Id',true,false);" src="../1.10.0.1079.0.03/base/theme                s/oracle/images/iconSearch.gif" /></td>";
+	row += "<td>Priority: <input type='text' size='1'></input></td>";
+	row += "<td>Indication: <select><option></option><option>Allergy</option><option>Asthma</option></td>";
+	row += "<td>Issues: <select><option></option><option>Side effects</option><option>Efficacy</option></td>";
+	row += "<td><input type='button' name='delete' value='delete' onclick='jQuery(this).parent().parent().remove()'></input></td>";
+	row += "</tr>";
+
+	var html = "<div>";
+	html += "<table id='mrk_details'>";
+	html += row;
+	html += "</table>";
+	html += "</div>";
+
+	var e = jQuery("[class='buttonChildTitleBarTD']").filter("[id^='CallsProdDetail']").get(0);
+	e.onclick = function() {};
+	jQuery("[class='buttonChildTitleBarTD']").filter("[id^='CallsProdDetail']").click(function() {
+		if ( jQuery("#mrk_details").size() === 0 ) {
+			jQuery("#CallsProdDetailChildListDiv").next().replaceWith(html);
+		} else {
+			jQuery("#mrk_details").append(row);
+		}
+	});    
 };
 
 //***************************************************************************
