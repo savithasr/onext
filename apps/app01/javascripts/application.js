@@ -1,4 +1,4 @@
-// sandbox ourselves to guarantee we don't interfere with OnDemand platform--abhishek test
+// sandbox ourselves to guarantee we don't interfere with OnDemand platform
 // JS internals
 jQuery(function($) {
     
@@ -19,60 +19,6 @@ var copyPreviousObjectiveHandler = function() {
         var ownerId = $get('AccountCallInsert.Owner Id').val();
         var contactPerId = $get('AccountCallInsert.Contact Per Id').val();
         var $objectiveInputElement = $get('AccountCallInsert.VONDMED Call');
-        var objectiveValue = $objectiveInputElement.val();
-        
-        // already has a value so don't overwrite
-        if (objectiveValue !== '') { return; }
-
-        var obj = {ownerId: ownerId, contactPerId: contactPerId, objectiveValue: objectiveValue};
-
-        console.dir(obj);
-        
-        var fields = {
-            ActivityId: '',
-            PrimaryContactId: " ='" + contactPerId + "' ",
-            PrimaryContactLastName: '',
-            PrimaryContactFirstName: '',
-            Owner: '',
-            AccountId: '',
-            CallType: '',
-            PrimaryContact: '',
-            CreatedBy: '',
-            Location: '',
-            Objective: '',
-            OwnerId: " ='" + ownerId + "' ",
-            Status: '',
-            Type: '',
-            ActivitySubType: '',
-            CreatedDate: '',
-            ModifiedDate: '',
-            Date: '',
-            StartTime: '',
-            EndTime: ''
-        };
-        
-         odlib.activityQuery(fields, function(data) {
-
-             // no previous activities on contact
-             if (data.length === 0) {
-                 return;
-             }
-             
-             data.sort(function(item1, item2) {
-                 return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
-             });
-             
-             var lastObjectiveValue = data[data.length - 1].Objective;
-             $objectiveInputElement.val(lastObjectiveValue);
-             console.dir(data);            
-    });
-    
-};
-
-var copyContactPreviousObjectiveHandler = function() {
-        var ownerId = $get('ContactCallInsert.Owner Id').val();
-        var contactPerId = $get('ContactCallInsert.Contact Per Id').val();
-        var $objectiveInputElement = $get('ContactCallInsert.VONDMED Call');
         var objectiveValue = $objectiveInputElement.val();
         
         // already has a value so don't overwrite
@@ -188,12 +134,6 @@ var pluginsDefinitions = [
         name: 'Copy Previous Objective',
         invokeOnPattern: /AccountCallInsert/ig,
         handler: copyPreviousObjectiveHandler,
-        requiresLogin: true
-    },
-	{
-        name: 'Copy Previous Objective',
-        invokeOnPattern: /ContactCallInsert/ig,
-        handler: copyContactPreviousObjectiveHandler,
         requiresLogin: true
     },
     {
