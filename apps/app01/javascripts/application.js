@@ -37,7 +37,7 @@ var copyPreviousObjectiveHandler = function() {
             AccountId: '',
             CallType: '',
 	    Subject: "='"+ "wow" +"'",
-            PrimaryContact: "='"+ "IDC Test"+"'" ,
+            PrimaryContact: '' ,
             CreatedBy: '',
             Location: '',
             Objective: '',
@@ -56,7 +56,7 @@ var copyPreviousObjectiveHandler = function() {
 
              // no previous activities on contact
           //   if (data.length === 0) {
-                 return;
+          //       return;
           //   }
              
            //  data.sort(function(item1, item2) {
