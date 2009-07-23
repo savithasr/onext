@@ -783,13 +783,13 @@ OnDemandLib.prototype.entityQuery = function(entityType, fields, callback) {
     }
 }
 
-OnDemandLib.prototype.activityQuery = function(fields, callback) {
-    var soapAction = 'document/urn:crmondemand/ws/activity/10/2004:Activity_QueryPage';
+OnDemandLib.prototype.activityInsert = function(fields, callback) {
+    var soapAction = 'document/urn:crmondemand/ws/activity/10/2004:Activity_Insert';
     var soapRequestTemplate = '' +
         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
         '   <soapenv:Header/>' +
         '   <soapenv:Body>' +
-        '      <ActivityNWS_Activity_QueryPage_Input xmlns="urn:crmondemand/ws/activity/10/2004">' +
+        '      <ActivityNWS_ActivityInsert_Input xmlns="urn:crmondemand/ws/activity/10/2004">' +
         '         <PageSize>100</PageSize>' +
         '         <ListOfActivity>' +
         '            <Activity>' +
@@ -797,7 +797,7 @@ OnDemandLib.prototype.activityQuery = function(fields, callback) {
         '            </Activity>' +
         '         </ListOfActivity>' +
         '         <StartRowNum>0</StartRowNum>' +
-        '      </ActivityNWS_Activity_QueryPage_Input>' +
+        '      </ActivityNWS_ActivityInsert_Input>' +
         '   </soapenv:Body>' +
         '</soapenv:Envelope>';
         

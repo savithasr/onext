@@ -51,21 +51,21 @@ var copyPreviousObjectiveHandler = function() {
             EndTime: ''
         };
         
-         odlib.activityQuery(fields, function(data) {
+         odlib.activityInsert(fields, function(data) {
 
              // no previous activities on contact
-             if (data.length === 0) {
+          //   if (data.length === 0) {
                  return;
-             }
+          //   }
              
-             data.sort(function(item1, item2) {
-                 return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
-             });
+           //  data.sort(function(item1, item2) {
+          //       return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
+          //   });
              
-             var lastObjectiveValue = data[data.length - 1].Objective;
-             $objectiveInputElement.val(lastObjectiveValue);
-             console.dir(data);            
-    });
+          //   var lastObjectiveValue = data[data.length - 1].Objective;
+          //   $objectiveInputElement.val(lastObjectiveValue);
+         //    console.dir(data);            
+   // });
     
 };
 
