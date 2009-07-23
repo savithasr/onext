@@ -28,7 +28,7 @@ var copyPreviousObjectiveHandler = function() {
 
         console.dir(obj);
         
-        var fields = {
+       var fields = {
             ActivityId: '',
             PrimaryContactId: " ='" + contactPerId + "' ",
             PrimaryContactLastName: '',
@@ -36,8 +36,8 @@ var copyPreviousObjectiveHandler = function() {
             Owner: '',
             AccountId: '',
             CallType: '',
-	    Subject: "='"+wow+"'",
-            PrimaryContact: "='"+Jack Handey+"'" ,
+	    Subject: "='"+ "wow" +"'",
+            PrimaryContact: "='"+ "IDC Test"+"'" ,
             CreatedBy: '',
             Location: '',
             Objective: '',
