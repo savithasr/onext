@@ -699,6 +699,64 @@ OnDemandLib.prototype.manualQuery = function(entityType, fields, soapAction, soa
 
 }
 
+
+OnDemandLib.prototype.manualInsert = function(entityType, fields, soapAction, soapRequestTemplate, callback) {
+    var that = this;
+    
+    var pageroot = document.location;
+    pageroot = pageroot.toString();
+    pageroot = pageroot.substr(0, pageroot.indexOf('/', 10));    
+    
+    var entityTypeLowercase = entityType.toLowerCase();
+    var entityTypeCapitalized = entityTypeLowercase.substring(0,1).toUpperCase() + entityTypeLowercase.substring(1); 
+    
+    var fieldsXML = '';
+    for (fieldName in fields) {
+        fieldsXML += '<' + fieldName + '>' + fields[fieldName] + '</' + fieldName + '>';
+    }
+    
+    var soapRequest = soapRequestTemplate.replace("<%=fields%>", fieldsXML);
+      
+    jQuery.ajax({
+        url: pageroot + '/Services/Integration',
+        type: 'POST',
+        contentType: 'text/xml',
+        dataType: 'xml',
+        data: soapRequest,
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('SOAPAction', '"' + soapAction + '"');
+        },            
+        success: function(xmlData, textStatus) {
+            var items = that.getListData(entityTypeCapitalized, xmlData);
+
+            if (callback.itemsCache) {
+                callback.itemsCache = callback.itemsCache.concat(items);
+            } else {
+                callback.itemsCache = [].concat(items);
+            }
+
+            var lastPage = jQuery('ns\\:LastPage', xmlData).text().toLowerCase();
+
+            if (lastPage == 'true') {
+                callback.more = false;
+                callback(callback.itemsCache);
+            } else {
+                callback.more = true;
+                that.entityQuery(entityType, fields, callback);                    
+            }
+            window.xmlData = xmlData;
+        }
+    });
+
+}
+
+
+
+
+
+
+
+
 OnDemandLib.prototype.entityQuery = function(entityType, fields, callback) {    
     var that = this;
     var inSoap;
@@ -783,7 +841,7 @@ OnDemandLib.prototype.entityQuery = function(entityType, fields, callback) {
     }
 }
 
-OnDemandLib.prototype.activityInsert = function(fields, callback) {
+OnDemandLib.prototype.activityInsert = function(fields,callback) {
     var soapAction = 'document/urn:crmondemand/ws/activity/10/2004:Activity_Insert';
     var soapRequestTemplate = '' +
         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
@@ -801,7 +859,7 @@ OnDemandLib.prototype.activityInsert = function(fields, callback) {
         '   </soapenv:Body>' +
         '</soapenv:Envelope>';
         
-    this.manualQuery('Activity', fields, soapAction, soapRequestTemplate, function(data) {
+    this.manualInsert('Activity', fields, soapAction, soapRequestTemplate, function(data) {
         callback(data);
     });
 }

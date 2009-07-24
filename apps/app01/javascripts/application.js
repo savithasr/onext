@@ -36,7 +36,7 @@ var copyPreviousObjectiveHandler = function() {
             Owner: '',
             AccountId: '',
             CallType: '',
-	    Subject: "='"+ "wow" +"'",
+	    Subject: "Insert Test",
             PrimaryContact: '' ,
             CreatedBy: '',
             Location: '',
