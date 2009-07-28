@@ -20,6 +20,14 @@ var copyPreviousObjectiveHandler = function() {
         var contactPerId = $get('AccountCallInsert.Contact Per Id').val();
         var $objectiveInputElement = $get('AccountCallInsert.VONDMED Call');
         var objectiveValue = $objectiveInputElement.val();
+	  var primaryContact = $get('ContactCallInsert.Contact Full Name').val();
+	  var startTime = $get('ContactCallInsert.Planned').val();
+	  var endTime = $get('ContactCallInsert.Planned Completion').val;
+	  var typeId = $get('ContactCallInsert.Type').val();
+	  var durationVal = $get('ContactCallInsert.VONDMED Calc Duration').val();
+
+		var subjectValue = 'testingCallCreate';
+		var objectiveValue = 'testobj2307';
         
         // already has a value so don't overwrite
         if (objectiveValue !== '') { return; }
@@ -52,23 +60,61 @@ var copyPreviousObjectiveHandler = function() {
             EndTime: ''
         };
         
-         odlib.activityInsert(fields, function(data) {
+odlib.activityQuery(fields, function(data) {
 
-             // no previous activities on contact
-          //   if (data.length === 0) {
-          //       return;
-          //   }
+            no previous activities on contact
+            if (data.length === 0) {
+              return;
+            }
              
-           //  data.sort(function(item1, item2) {
-          //       return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
-          //   });
+            data.sort(function(item1, item2) {
+            return Date.parse(item1.StartTime) - Date.parse(item2.StartTime);
+            });
              
-          //   var lastObjectiveValue = data[data.length - 1].Objective;
-          //   $objectiveInputElement.val(lastObjectiveValue);
-         //    console.dir(data);            
-   // });
+            var lastObjectiveValue = data[data.length - 1].Objective;
+            $objectiveInputElement.val(lastObjectiveValue);
+            console.dir(data);            
+   });
     
 };
+
+-------------------------------------------------------------------------------------------------------------------
+
+		
+		
+
+		//            PrimaryContact: " ='" + primaryContact + "' ",
+		
+		var fields = {
+            CallType: typeId,
+            Objective: objectiveValue,
+            OwnerId: ownerId,
+            StartTime: startTime,
+            EndTime: endTime,
+			Duration: durationVal,
+			Subject: subjectValue
+        };
+		
+		var fieldsCont = {
+			ContactId: contactPerId
+        };
+				
+		createWebServCall(fields, fieldsCont);
+	}
+
+
+
+
+
+odlib.activityInsert(fields, function(data){
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 var copyContactPreviousObjectiveHandler = function() {
         var ownerId = $get('ContactCallInsert.Owner Id').val();
@@ -119,7 +165,9 @@ var copyContactPreviousObjectiveHandler = function() {
              
              var lastObjectiveValue = data[data.length - 1].Objective;
              $objectiveInputElement.val(lastObjectiveValue);
-             console.dir(data);            
+             console.dir(data);   
+
+		addProdDeailedSec();         
     });
     
 };
@@ -221,87 +269,9 @@ applyPlugins();
     
 });
 
-/*
-var fields = {
-    ActivityId: '',
-    PrimaryContactId: " ='" + contactPerId + "' ",
-    PrimaryContactLastName: '',
-    PrimaryContactFirstName: '',
-    Owner: '',
-    AccountId: '',
-    CallType: '',
-    PrimaryContact: '',
-    CreatedBy: '',
-    Location: '',
-    Objective: '',
-    OwnerId: " ='" + ownerId + "' ",
-    Status: '',
-    Type: '',
-    ActivitySubType: '',
-    CreatedDate: '',
-    ModifiedDate: '',
-    Date: '',
-    StartTime: '',
-    EndTime: ''
-};
-
-if (pageName === 'ContactCallDetail') {
-    var valueLabel = $( $("td:contains('Objective')")[1] ).next();
-    // TODO: implement objective exists logic
-    var currentCallObjectiveExists = $.trim( valueLabel.text() ) !== '';
-    if (!currentCallObjectiveExists) {
-        // autopopulate Objective with previous call objective
-        valueLabel.mouseover();
-        valueLabel.click();
-        var inlineEditor = jQuery('.iled');
-        inlineEditor.val((new Date()).toString() + ': last objective' );
-        var okButton = inlineEditor.parent().next().children().get(0);
-        okButton.click();
-        valueLabel.mouseout();
-    }
+function addProdDeailedSec(){
+	var newTable = "<tr><td colspan='4'><table class='ctb' cellspacing='0' cellpadding='0'><tr><td>Products Detailed</td><td><div class='buttonChildTitleBarTD'>New</div></td><td width='100%'></td></tr></table></td></tr>";
+	jQuery("[id='ContactCallInsert.VONDMED Next Call']").parent().parent().parent().append(newTable);
+	alert("Added new section");
 }
 
- odlib.activityQuery(fields, function(data) {
-     alert( JSON.stringify(data) );
-     console.dir(data);
-});
-
-     var userFields = {AccountName:''};
-     var entities = [
-        {
-            name: 'Account',
-            fields: {AccountName: ''}
-        },
-        {
-            name: 'Contact',
-            fields: {ContactFullName: '', ContactId: ''}
-        },
-        {
-            name: 'User',
-            fields: {UserLoginId: '', UserId: ''}
-        }
-     ];
-
-
-     jQuery.each(entities, function(index, entity) {
-         odlib.entityQuery(entity.name, entity.fields, function(data) {
-             console.log(entity.name + ' count = ' + data.length);
-         });                 
-     });
-
-     
-     odlib.entityQuery('Contact', {ContactFullName: '', ContactId: ''}, function(data) {
-         console.dir(data);
-      });
-
-      odlib.user_login(userName, password, function() {
-           var userFields = ['FirstName', 'LastName'];
-           console.log('begin user_login');
-           odlib.query_user(userFields, function(data) {
-               console.dir(data);
-           });
-           console.log('end user_login');        
-       });
-
-
-*/

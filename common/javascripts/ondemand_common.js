@@ -700,7 +700,7 @@ OnDemandLib.prototype.manualQuery = function(entityType, fields, soapAction, soa
 }
 
 
-OnDemandLib.prototype.manualInsert = function(entityType, fields, soapAction, soapRequestTemplate, callback) {
+OnDemandLib.prototype.activityInsert = function(entityType, fields, soapAction, soapRequestTemplate, callback) {
     var that = this;
     
     var pageroot = document.location;
@@ -711,18 +711,25 @@ OnDemandLib.prototype.manualInsert = function(entityType, fields, soapAction, so
     var entityTypeCapitalized = entityTypeLowercase.substring(0,1).toUpperCase() + entityTypeLowercase.substring(1); 
     
     var fieldsXML = '';
-    for (fieldName in fields) {
-        fieldsXML += '<' + fieldName + '>' + fields[fieldName] + '</' + fieldName + '>';
-    }
+	for (fieldName in fields) {
+	fieldsXML += '<' + fieldName + '>' + fields[fieldName] + '</' + fieldName + '>';
+	}
+			
+	var fieldsXMLCont = '';
+	for (fieldNameCont in fieldsCont) {
+	fieldsXMLCont += '<' + fieldNameCont + '>' + fieldsCont[fieldNameCont] + '</' + fieldNameCont + '>';
+	}			
+
+	var soapRequest = soapRequestTemplate.replace("<%=fields%>", fieldsXML);	
+	var soapRequestFinal = soapRequest.replace("<%=fieldsCont%>", fieldsXMLCont);
     
-    var soapRequest = soapRequestTemplate.replace("<%=fields%>", fieldsXML);
-      
+         
     jQuery.ajax({
         url: pageroot + '/Services/Integration',
         type: 'POST',
         contentType: 'text/xml',
         dataType: 'xml',
-        data: soapRequest,
+        data: soapRequestFinal,
         beforeSend: function(xhr) {
             xhr.setRequestHeader('SOAPAction', '"' + soapAction + '"');
         },            
@@ -750,119 +757,124 @@ OnDemandLib.prototype.manualInsert = function(entityType, fields, soapAction, so
 
 }
 
-
-
-
-
-
-
-
-OnDemandLib.prototype.entityQuery = function(entityType, fields, callback) {    
-    var that = this;
-    var inSoap;
-    var x;
-    
-    var entityTypeLowercase = entityType.toLowerCase();
-    var entityTypeCapitalized = entityTypeLowercase.substring(0, 1).toUpperCase() + entityTypeLowercase.substring(1);
-    
-    var pageroot = document.location;
-    pageroot = pageroot.toString();
-    pageroot = pageroot.substr(0, pageroot.indexOf('/', 10));
-    
-    var pageSize = 5;
-    
-    if (typeof callback.startRowNum === 'undefined') {
-         callback.startRowNum = 0;
-    } else {
-        if (callback.startRowNum === 0) {
-            callback.startRowNum = pageSize + 1;
-        } else {
-            callback.startRowNum = callback.startRowNum + pageSize;
-        }
-    }
-
-    inSoap = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">';
-    inSoap += '<soapenv:Header/>';
-    inSoap += '<soapenv:Body>';
-    inSoap += '<' + entityTypeCapitalized + 'WS_' + entityTypeCapitalized + 'QueryPage_Input xmlns="urn:crmondemand/ws/' + entityTypeLowercase + '/">';
-    inSoap += '<StartRowNum>' + callback.startRowNum + '</StartRowNum>';
-    inSoap += '<PageSize>' + pageSize + '</PageSize>';
-    inSoap += '<ListOf' + entityTypeCapitalized + '>';
-    inSoap += '<' + entityTypeCapitalized + '>';
-
-    for (x in fields) {
-        inSoap += '<' + x + '>' + fields[x] + '</' + x + '>';
-    }
-
-    inSoap += '</' + entityTypeCapitalized + '>';
-    inSoap += '</ListOf' + entityTypeCapitalized + '>';
-    inSoap += '</' + entityTypeCapitalized + 'WS_' + entityTypeCapitalized + 'QueryPage_Input>';
-    inSoap += '</soapenv:Body>';
-    inSoap += '</soapenv:Envelope>';
-
-    // Submit XML request, run callback function upon response
-    try {
-        
-        jQuery.ajax({
-            url: pageroot + '/Services/Integration',
-            type: 'POST',
-            contentType: 'text/xml',
-            dataType: 'xml',
-            data: inSoap,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', '"document/urn:crmondemand/ws/' + entityTypeLowercase + '/:' + entityTypeCapitalized + 'QueryPage"');
-            },            
-            complete: function(xhr, textStatus) {
-            },
-            success: function(xmlData, textStatus) {
-                var items = that.getListData(entityTypeCapitalized, xmlData);
-
-                if (callback.itemsCache) {
-                    callback.itemsCache = callback.itemsCache.concat(items);
-                } else {
-                    callback.itemsCache = [].concat(items);
-                }
-
-                var lastPage = jQuery('ns\\:LastPage', xmlData).text().toLowerCase();
-
-                if (lastPage == 'true') {
-                    callback.more = false;
-                    callback(callback.itemsCache);
-                } else {
-                    callback.more = true;
-                    that.entityQuery(entityType, fields, callback);                    
-                }
-                window.xmlData = xmlData;
-            }
-        });
-        
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
+OnDemandLib.prototype.entityQuery = function(entityType, fields, callback) { 
+var that = this;
+var inSoap;
+var x;
+var entityTypeLowercase = entityType.toLowerCase();
+var entityTypeCapitalized = entityTypeLowercase.substring(0, 1).toUpperCase() + entityTypeLowercase.substring(1);
+var pageroot = document.location;
+pageroot = pageroot.toString();
+pageroot = pageroot.substr(0, pageroot.indexOf('/', 10));
+var pageSize = 5;
+if (typeof callback.startRowNum === 'undefined') {
+callback.startRowNum = 0;
+} else {
+if (callback.startRowNum === 0) {
+callback.startRowNum = pageSize + 1;
+} else {
+callback.startRowNum = callback.startRowNum + pageSize;
+}
+}
+inSoap = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">';
+inSoap += '<soapenv:Header/>';
+inSoap += '<soapenv:Body>';
+inSoap += '<' + entityTypeCapitalized + 'WS_' + entityTypeCapitalized + 'QueryPage_Input xmlns="urn:crmondemand/ws/' + entityTypeLowercase + '/">';
+inSoap += '<StartRowNum>' + callback.startRowNum + '</StartRowNum>';
+inSoap += '<PageSize>' + pageSize + '</PageSize>';
+inSoap += '<ListOf' + entityTypeCapitalized + '>';
+inSoap += '<' + entityTypeCapitalized + '>';
+for (x in fields) {
+inSoap += '<' + x + '>' + fields[x] + '</' + x + '>';
+}
+inSoap += '</' + entityTypeCapitalized + '>';
+inSoap += '</ListOf' + entityTypeCapitalized + '>';
+inSoap += '</' + entityTypeCapitalized + 'WS_' + entityTypeCapitalized + 'QueryPage_Input>';
+inSoap += '</soapenv:Body>';
+inSoap += '</soapenv:Envelope>';
+// Submit XML request, run callback function upon response
+try {
+jQuery.ajax({
+url: pageroot + '/Services/Integration',
+type: 'POST',
+contentType: 'text/xml',
+dataType: 'xml',
+data: inSoap,
+beforeSend: function(xhr) {
+xhr.setRequestHeader('SOAPAction', '"document/urn:crmondemand/ws/' + entityTypeLowercase + '/:' + entityTypeCapitalized + 'QueryPage"');
+}, 
+complete: function(xhr, textStatus) {
+},
+success: function(xmlData, textStatus) {
+var items = that.getListData(entityTypeCapitalized, xmlData);
+if (callback.itemsCache) {
+callback.itemsCache = callback.itemsCache.concat(items);
+} else {
+callback.itemsCache = [].concat(items);
+}
+var lastPage = jQuery('ns\\:LastPage', xmlData).text().toLowerCase();
+if (lastPage == 'true') {
+callback.more = false;
+callback(callback.itemsCache);
+} else {
+callback.more = true;
+that.entityQuery(entityType, fields, callback); 
+}
+window.xmlData = xmlData;
+}
+});
+} catch (e) {
+alert('Error: ' + e.message);
+}
+}
+OnDemandLib.prototype.activityQuery = function(fields, callback) {
+var soapAction = 'document/urn:crmondemand/ws/activity/10/2004:Activity_QueryPage';
+var soapRequestTemplate = '' +
+'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+' <soapenv:Header/>' +
+' <soapenv:Body>' +
+' <ActivityNWS_Activity_QueryPage_Input xmlns="urn:crmondemand/ws/activity/10/2004">' +
+' <PageSize>100</PageSize>' +
+' <ListOfActivity>' +
+' <Activity>' +
+' <%=fields%>' +
+' </Activity>' +
+' </ListOfActivity>' +
+' <StartRowNum>0</StartRowNum>' +
+' </ActivityNWS_Activity_QueryPage_Input>' +
+' </soapenv:Body>' +
+'</soapenv:Envelope>';
+this.manualQuery('Activity', fields, soapAction, soapRequestTemplate, function(data) {
+callback(data);
+});
 }
 
-OnDemandLib.prototype.activityInsert = function(fields,callback) {
-    var soapAction = 'document/urn:crmondemand/ws/activity/10/2004:Activity_Insert';
-    var soapRequestTemplate = '' +
-        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
-        '   <soapenv:Header/>' +
-        '   <soapenv:Body>' +
-        '      <ActivityNWS_ActivityInsert_Input xmlns="urn:crmondemand/ws/activity/10/2004">' +
-        '         <PageSize>100</PageSize>' +
-        '         <ListOfActivity>' +
-        '            <Activity>' +
-        '               <%=fields%>' +
-        '            </Activity>' +
-        '         </ListOfActivity>' +
-        '         <StartRowNum>0</StartRowNum>' +
-        '      </ActivityNWS_ActivityInsert_Input>' +
-        '   </soapenv:Body>' +
-        '</soapenv:Envelope>';
-        
-    this.manualInsert('Activity', fields, soapAction, soapRequestTemplate, function(data) {
-        callback(data);
-    });
+OnDemandLib.prototype.activityInsert = function(fields, callback) {
+var soapAction = 'document/urn:crmondemand/ws/contact/10/2004:ContactInsertChild';
+			var soapRequestTemplate = '' +
+				'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+				'   <soapenv:Header/>' +
+				'   <soapenv:Body>' +
+				'      <ContactWS_ContactInsertChild_Input xmlns="urn:crmondemand/ws/contact/10/2004">' +
+				'         <ListOfContact>' +
+				'            <Contact>' +
+				'               <%=fieldsCont%>' +
+				' 		        <ListOfActivity>' +
+				'					<Activity>'	+
+				'		               <%=fields%>' +				
+				'					</Activity>' +				
+				'         		</ListOfActivity>' +				
+				'            </Contact>' +
+				'         </ListOfContact>' +
+				'      </ContactWS_ContactInsertChild_Input>' +
+				'   </soapenv:Body>' +
+				'</soapenv:Envelope>';	
+this.activityInsert('Activity', fields, soapAction, soapRequestTemplate, function(data) {
+callback(data);
+});
 }
+
+
 
 OnDemandLib.prototype.saveProdDetail = function ()
 {
